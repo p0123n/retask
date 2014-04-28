@@ -1,0 +1,207 @@
+<div data-ng-show="sprintFound || sprintBeingRefreshed">
+	<div data-ng-show="firstRun || itemsCount <= 0">
+		<div data-preloader data-type="simple"></div>
+	</div>
+	<div data-ng-hide="firstRun || itemsCount <= 0">
+		<h2><a target="_blank" data-ng-href="https://###JIRA_ON_DEMAND.jira.com/secure/RapidBoard.jspa?rapidView={{sprint.rapidViewId}}&view=planning">{{sprint.name}}</a></h2>
+		<!--<sup class="cache-time-left">cached for 10 minutes</sup>-->
+		{{sprint.startDate | date:'medium'}} &rarr; {{sprint.endDate | date:'medium'}}
+
+		<button type="button" class="btn btn-default btn-jira-refresh-cache" data-ng-click="forceEpicCacheRefresh()" data-ng-disabled="sprintBeingRefreshed"><span class="glyphicon glyphicon-flash"></span> Fetch fresh data from JIRA</button>
+		<h2 id="epics-summary">Summary table</h2>
+
+		<ul class="epic-details">
+			<li>
+				<span data-ng-repeat="(status, count) in summary.total.statuses">
+					<span>{{status}}</span>
+					<span>{{count}}</span>
+				</span>
+			</li>
+		</ul>
+
+		<table class="table table-bordered table-hover">
+			<thead>
+				<tr>
+					<th style="width: 100px"># Task Id</th>
+					<th style="width: 600px">Epic</th>
+					<th colspan="2" class="thicker-left">Total</th>
+					<th colspan="2" class="thicker-left">Frontend</th>
+					<th colspan="2" class="thicker-left">Backend</th>
+					<th colspan="2" class="thicker-left">Other</th>
+				</tr>
+				<tr class="center-th">
+					<th></th>
+					<th></th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="(epicId, epic) in items" data-ng-class="epic.total.opened <= 0?'success':null">
+					<td><a href="{{epicId | jiraIssueUrl}}">{{epicId}}</a></td>
+					<td>
+							<a data-ng-if="epic.title"  data-scroll-to="{{epicId}}" href="javascript:void(0);">{{epic.title}}</a>
+							<a data-ng-if="!epic.title" data-scroll-to="{{epicEmptyCode}}" href="#">No epic</a>
+					</td>
+					<td class="thicker-left">{{epic.total.closed}}</td>
+					<td>{{epic.total.opened}}</td>
+					<td class="thicker-left">{{epic.frontend.closed}}</td>
+					<td>{{epic.frontend.opened}}</td>
+					<td class="thicker-left">{{epic.backend.closed}}</td>
+					<td>{{epic.backend.opened}}</td>
+					<td class="thicker-left">{{epic.unknown.closed}}</td>
+					<td>{{epic.unknown.opened}}</td>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+			<tfoot>
+				<tr class="center-th">
+					<th></th>
+					<th></th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+					<th class="thicker-left">+</th>
+					<th>-</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th colspan="2" class="thicker-left">Total</th>
+					<th colspan="2" class="thicker-left">Frontend</th>
+					<th colspan="2" class="thicker-left">Backend</th>
+					<th colspan="2" class="thicker-left">Other</th>
+				</tr>
+			</tfoot>
+		</table>
+
+		<ul>
+			<li>&laquo;+&raquo; &mdash; Close tasks</li>
+			<li>&laquo;-&raquo; &mdash; Open tasks, in progress, to be tested etc</li>
+		</ul>
+
+		<div data-ng-repeat="(epicId, epic) in items">
+			<h2 id="{{epicId?epicId:epicEmptyCode}}">
+				<span data-ng-if="epic.title">{{epic.title}} <a href="{{epicId | jiraIssueUrl}}">{{epicId}}</a></span>
+				<span data-ng-if="!epic.title">No epic</span>
+			</h2>
+			<ul class="epic-details">
+				<li>
+					<span data-ng-repeat="(status, count) in epic.total.statuses">
+						<span>{{status}}</span>
+						<span>{{count}}</span>
+					</span>
+				</li>
+				<li>&nbsp;</li>
+				<li>
+					<span><span>Time original est</span></span>
+					<span
+						data-ng-pluralize
+						count="epic.total.seconds_planned"
+						when='{
+							"1": "1 second",
+							"other": "{} seconds"
+						}'
+					></span></li>
+				<li><span><span>Time spent</span></span> <span>N/A</span></li>
+				<li><span><span>Time remaining</span></span> <span>N/A</span></li>
+			</ul>
+
+			<table class="table table-bordered table-hover" data-table-sorter>
+				<thead>
+					<tr>
+						<th data-column-id="id" style="width: 100px">
+							# Task id
+						</th>
+						<th data-column-id="title">Title</th>
+						<th data-column-id="assignee">
+							<a href="javascript:void(0)" data-ng-click="orderByField='assignee'; reverseSort = !reverseSort">
+								Assignee
+								<span data-ng-show="orderByField == 'assignee'">
+									<span data-ng-show="!reverseSort">↑</span>
+									<span data-ng-show="reverseSort">↓</span>
+								</span>
+							</a>
+						</th>
+						<th data-column-id="type">
+							<a href="javascript:void(0)" data-ng-click="orderByField='type'; reverseSort = !reverseSort">
+								Work type
+								<span data-ng-show="orderByField == 'type'">
+									<span data-ng-show="!reverseSort">↑</span>
+									<span data-ng-show="reverseSort">↓</span>
+								</span>
+							</a>
+						</th>
+						<th data-column-id="status">
+							<a href="javascript:void(0)" data-ng-click="orderByField='status'; reverseSort = !reverseSort">
+								Status
+								<span data-ng-show="orderByField == 'status'">
+									<span data-ng-show="!reverseSort">↑</span>
+									<span data-ng-show="reverseSort">↓</span>
+								</span>
+							</a>
+						</th>
+						<th data-ng-if="epic.total.opened > 0"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr data-ng-class="resolveIssueClass(issue.status)" data-ng-repeat="issue in epic.issues|orderBy:orderByField:reverseSort">
+						<td><a href="{{issue.id | jiraIssueUrl}}">{{issue.id}}</a></td>
+						<td>
+							{{issue.title}}
+							<span data-ng-if="issue.parentId">
+							@ <a href="{{issue.parentId | jiraIssueUrl}}">{{issue.parentId}}</a>
+							</span>
+						</td>
+						<td>{{issue.assignee}}</td>
+						<td>{{issue.type}}</td>
+						<td>{{issue.status}}</td>
+						<td data-ng-if="epic.total.opened > 0">
+							<div class="dropdown dropdown-left" data-ng-controller="epicButtonController">
+								<a class="dropdown-toggle" href="#"><span class="glyphicon glyphicon-list"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="javascript:void(0)" data-ng-click="skypeNotify(issue.assignee_id, issue.id)">Notify via skype</a></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div data-ng-hide="sprintFound || sprintBeingRefreshed">
+	<div class="row">
+		<div class="col-md-4">
+			<h2>Got any Sprint ID?</h2>
+			<form method="GET" data-ng-submit="showSprintInformation()">
+				<div class="input-group input-group-sm">
+					<input type="text" class="form-control" autofocus placeholder="Sprint ID" data-ng-model="sprintId">
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="submit">
+							<span class="glyphicon glyphicon-search"></span>
+						</button>
+					</span>
+				</div>
+			</form>
+		</div>
+		<div class="col-md-8">
+			<h2>How do I know my Sprint ID?</h2>
+			To get the Sprint ID copy and paste the following in to the address bar while you're on the Work mode of a Rapid Board:
+			<br>
+			<br>
+			<code>
+				javascript:alert("Sprint ID is " + jQuery("SPAN[data-sprint-id]").attr("data-sprint-id"))
+			</code>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,121 @@
+<div data-ng-hide="project">
+	<div data-preloader data-type="large" data-message="Loading project..."></div>
+</div>
+
+<div class="row" data-ng-show="project">
+	<div class="col-lg-8">
+		<h2>
+			Project &quot;{{project.project.title}}&quot;
+			<div class="btn-group">
+				<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+					Этап 4 <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="javascript:void(0)" data-ng-click="loadProject(true)"><i class="glyphicon glyphicon-refresh"></i> Refresh</a></li>
+					<li class="divider"></li>
+					<li><a href="#">Этап 1</a></li>
+					<li><a href="#">Этап 2</a></li>
+					<li><a href="#">Этап 3</a></li>
+					<li><a href="#">Этап 5</a></li>
+					<li><a href="#">Этап 6</a></li>
+					<li><a href="#">Этап 7</a></li>
+				</ul>
+			</div>
+		</h2>
+		<hr>
+		<div data-ng-hide="summary">
+			<div data-preloader data-type="large" data-message="Loading latest JIRA info..."></div>
+		</div>
+		<div class="row" data-ng-show="summary">
+			<div class="col-lg-6">
+				<h3 class="h3-tm0">Active/upcoming sprints</h3>
+				<div class="list-group">
+					<a href="#/p/{{project.project.project_id}}/s/{{sprint.id}}"
+					   class="list-group-item{{sprint.state == 'ACTIVE' ? ' active': ''}}"
+					   data-ng-repeat="sprint in summary.sprints.items">
+						<h4 class="list-group-item-heading">{{sprint.title}} ({{sprint.state_formatted}})</h4>
+						<p class="list-group-item-text">
+							{{sprint.dateInterval}}
+						</p>
+						<p class="list-group-item-text">
+							(<span
+								data-ng-pluralize
+								count="sprint.issuesCount"
+								when='{
+									"0": "No tasks yet",
+									"1": "1 task",
+									"other": "{} tasks"
+								}'
+							></span>)
+						</p>
+					</a>
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<h3 class="h3-tm0">Epics of current stage ({{epicsFiltered.length}})</h3>
+				<div class="input-group">
+					<input type="text" class="form-control" style="height: 40px" placeholder="Title" autofocus="" data-ng-model="searchEpics.title">
+					<span class="input-group-btn">
+						<button type="button"
+							class="btn btn-default{{searchEpics.done === false ? ' btn-primary' : ''}}"
+							data-ng-click="triggerSearchEpicsState(false)"
+						>In dev</button>
+					</span>
+					<span class="input-group-btn">
+						<button type="button"
+							class="btn btn-default{{searchEpics.done === true ? ' btn-primary' : ''}}"
+							data-ng-click="triggerSearchEpicsState(true)"
+						>Done</button>
+					</span>
+				</div>
+				&nbsp;
+				<div class="panel panel-default panel-hover panel-pointer"
+				     data-ng-repeat="epic in epicsFiltered = (summary.epics.items | filter:searchEpics)"
+				>
+					<div class="panel-body {{epic.done ? 'panel-success-light' : 'panel-danger-light'}}">
+						<div class="btn-group pull-right">
+							<button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+								<i class="glyphicon glyphicon-cog"></i> <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu" role="menu">
+								<li><a href="#">Create bug</a></li>
+								<li><a href="#/p/{{project.project.project_id}}/t/task?epicKey={{epic.key}}&version=11513">Create task</a></li>
+								<li class="divider"></li>
+								<li><a href="https://###JIRA_ON_DEMAND.jira.com/browse/{{epic.key}}" target="_blank"><i class="glyphicon glyphicon-link"></i> View in Jira</a></li>
+							</ul>
+						</div>
+						<h4 class="h4-tm0">
+							{{epic.title}}
+						</h4>
+						Issue #{{epic.key}}
+						<div class="panel-extra">
+							<i class="glyphicon glyphicon-chevron-down"></i>
+						</div>
+						<div class="panel-extra-content ng-hide">
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="col-lg-4">
+		<h2 style="padding-bottom: 6px;">Members ({{project.members.count}})</h2>
+		<hr>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="well well-sm" data-ng-repeat="member in project.members.items">
+					<div class="media">
+						<a class="thumbnail pull-left thumbnail-bm0" href="#/u/{{member.login}}">
+							<img class="media-object" data-ng-src="{{member.avatar}}" width="40" height="40">
+						</a>
+						<div class="media-body">
+							<h4 class="media-heading">{{member.full_name}}</h4>
+							<p><span class="label label-info">{{member.role_formatted}}</span>&nbsp;</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

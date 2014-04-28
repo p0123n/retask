@@ -1,0 +1,80 @@
+<h2>
+	Dasboard for project
+	<div class="btn-group">
+		<button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+			{{project.project.title}} <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu" role="menu">
+			<li><a href="/#/p/###PROJECT_KEY"><i class="glyphicon glyphicon-tasks"></i> Management</a></li>
+			<li class="divider"></li>
+			<li class="dropdown-header">No other projects yet</li>
+		</ul>
+	</div>
+</h2>
+<hr>
+<div class="row">
+	<div class="col-lg-3">
+		<h3 class="h3-tm0">
+			Builds
+			<div class="btn-group">
+				<button type="button" class="btn btn-success dropdown-toggle btn-sm" data-toggle="dropdown" data-ng-disabled='true'>
+					<i class="glyphicon glyphicon-save"></i> Deploy <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu pull-left" role="menu">
+				</ul>
+			</div>
+		</h3>
+		<hr>
+		<p>Will be integrated with bitbucket.org, Jenkins local instance, Jira.</p>
+	</div>
+	<div class="col-lg-9">
+		<h3 class="h3-tm0">
+			Technical debt
+			<button type="button" class="btn btn-success btn-sm" data-ng-disabled='true'>
+				<i class="glyphicon glyphicon-plus"></i> New task
+			</button>
+			<button type="button" class="btn btn-success btn-sm" data-ng-click='refreshTodos(true)' data-ng-disabled="todos === false">
+				<i class="glyphicon glyphicon-refresh"></i> Refresh
+			</button>
+		</h3>
+		<hr>
+		<div data-ng-hide="todos">
+			<div data-preloader data-type="large" data-message="Loading technical dept..."></div>
+		</div>
+		<table class="table-striped table-hover table-retask table-retask-right-actions" data-ng-show="todos">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>Summary</th>
+					<th>Author</th>
+					<th>Priority</th>
+					<th style="width: 150px;">Created at</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr data-ng-repeat="todo in todos">
+					<td>{{todo.todo_id}}</td>
+					<td>
+						<span data-ng-if="todo.status === 'private'"><strong>[Private]</strong></span>
+						{{todo.title}}
+					</td>
+					<td>{{todo.created_by.full_name}}</td>
+					<td>{{todo.priority.value}}</td>
+					<td>{{todo.created_at}}</td>
+					<td>
+						<div class="btn-group pull-right">
+							<button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown">
+								Actions <span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu pull-left" role="menu">
+								<li><a href="javascript:void(0)" data-ng-click='resolveTodo(todo.todo_id)'><i class="glyphicon glyphicon-ok"></i> Resolve</a></li>
+								<li><a href="javascript:void(0)"><i class="glyphicon glyphicon-send"></i> Export to Jira</a></li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
