@@ -1,3 +1,4 @@
 vendor/
 app/runtime/
+web/assets/
 composer.lock
